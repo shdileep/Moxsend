@@ -1,0 +1,11 @@
+{
+  "name": "Moxsend",
+  "description": "AI-powered cold email generation platform for personalized outreach at scale.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "AI Email Generation",
+    "Bulk CSV Processing",
+    "Email Performance Scoring",
+    "Iterative AI Improvements"
+  ]
+}

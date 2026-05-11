@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #6366f1;
+  --color-brand-secondary: #a855f7;
+  --color-brand-accent: #22d3ee;
+  
+  --font-sans: "Inter", "Geist", "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Geist", "Inter", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-[#030712] text-slate-200 antialiased selection:bg-brand-primary selection:text-white;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-slate-900/40 backdrop-blur-xl border border-slate-800/50 rounded-2xl shadow-2xl;
+  }
+  
+  .glass-input {
+    @apply bg-slate-950/50 border border-slate-800 focus:border-brand-primary/50 focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all rounded-xl p-4;
+  }
+  
+  .btn-primary {
+    @apply relative overflow-hidden bg-gradient-to-br from-brand-primary to-brand-secondary text-white font-medium px-6 py-3 rounded-xl transition-all hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-slate-800/50 hover:bg-slate-800 border border-slate-700 text-slate-300 font-medium px-6 py-3 rounded-xl transition-all active:scale-95;
+  }
+
+  .shimmer {
+    @apply relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Hide scrollbar completely */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
