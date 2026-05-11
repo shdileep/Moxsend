@@ -34,7 +34,7 @@ export async function generateEmails(params: EmailGenerationParams): Promise<Gen
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -86,7 +86,7 @@ export async function improveEmail(originalEmail: string, request: string): Prom
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -132,7 +132,7 @@ export async function extractLeadsFromFile(fileBase64: string, mimeType: string)
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -201,7 +201,7 @@ export async function extractLeadsFromText(text: string): Promise<Lead[]> {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
