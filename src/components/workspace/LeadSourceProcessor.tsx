@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { motion } from 'motion/react';
-import { Upload, FileSpreadsheet, X, CheckCircle2, FileText, Loader2, Download, FileImage } from 'lucide-react';
+import { Upload, FileSpreadsheet, X, CheckCircle2, FileText, Loader2, Download, FileImage, AlertCircle } from 'lucide-react';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { Lead } from '../../types';
@@ -17,6 +17,7 @@ export default function LeadFileProcessor({ onLeadsLoaded, isLoading: externalLo
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
   const [localLoading, setLocalLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const isLoading = externalLoading || localLoading;
 
@@ -24,6 +25,7 @@ export default function LeadFileProcessor({ onLeadsLoaded, isLoading: externalLo
     const ext = file.name.split('.').pop()?.toLowerCase();
     setFileName(file.name);
     setLocalLoading(true);
+    setErrorMsg(null);
 
     try {
       const fileIdStr = `${file.name}-${file.size}-${file.lastModified}`;
@@ -49,7 +51,17 @@ export default function LeadFileProcessor({ onLeadsLoaded, isLoading: externalLo
               role: row.role || row.Role || row.Title || row.title || '',
               status: 'idle' as const
             }));
-            onLeadsLoaded(leads, true, file.name, fileHash);
+            if (leads.length === 0) {
+              setErrorMsg('No leads found in CSV. Check your column headers (name, email, company, etc.).');
+              setFileName(null);
+            } else {
+              onLeadsLoaded(leads, true, file.name, fileHash);
+            }
+            setLocalLoading(false);
+          },
+          error: () => {
+            setErrorMsg('Failed to parse CSV file.');
+            setFileName(null);
             setLocalLoading(false);
           }
         });
@@ -83,12 +95,24 @@ export default function LeadFileProcessor({ onLeadsLoaded, isLoading: externalLo
               const pageText = textContent.items.map((item: any) => item.str).join(' ');
               fullText += pageText + '\n';
             }
+            if (!fullText.trim()) {
+              setErrorMsg('Could not extract text from PDF. It may be a scanned image — try uploading as PNG/JPG instead.');
+              setFileName(null);
+              setLocalLoading(false);
+              return;
+            }
             const extractedLeads = await extractLeadsFromText(fullText);
             const mappedLeads = extractedLeads.map(l => ({ ...l, status: 'idle' as const }));
-            onLeadsLoaded(mappedLeads, true, file.name, fileHash);
-          } catch(e) {
+            if (mappedLeads.length === 0) {
+              setErrorMsg('AI could not find any leads in this PDF. Check your Groq API key in Netlify env vars.');
+              setFileName(null);
+            } else {
+              onLeadsLoaded(mappedLeads, true, file.name, fileHash);
+            }
+          } catch(e: any) {
             console.error("PDF Parsing Error", e);
-            alert("Failed to parse PDF file.");
+            setErrorMsg(`PDF Error: ${e?.message || 'Unknown error. Check the browser console.'}`);
+            setFileName(null);
           } finally {
             setLocalLoading(false);
           }
@@ -97,11 +121,22 @@ export default function LeadFileProcessor({ onLeadsLoaded, isLoading: externalLo
       } else if (['jpeg', 'jpg', 'png'].includes(ext || '')) {
         const reader = new FileReader();
         reader.onload = async () => {
-          const base64 = (reader.result as string).split(',')[1];
-          const extractedLeads = await extractLeadsFromFile(base64, file.type);
-          const mappedLeads = extractedLeads.map(l => ({ ...l, status: 'idle' as const }));
-          onLeadsLoaded(mappedLeads, true, file.name, fileHash);
-          setLocalLoading(false);
+          try {
+            const base64 = (reader.result as string).split(',')[1];
+            const extractedLeads = await extractLeadsFromFile(base64, file.type);
+            const mappedLeads = extractedLeads.map(l => ({ ...l, status: 'idle' as const }));
+            if (mappedLeads.length === 0) {
+              setErrorMsg('AI could not extract leads from this image. Check your Groq API key in Netlify env vars.');
+              setFileName(null);
+            } else {
+              onLeadsLoaded(mappedLeads, true, file.name, fileHash);
+            }
+          } catch (e: any) {
+            setErrorMsg(`Image Error: ${e?.message || 'Unknown error.'}`);
+            setFileName(null);
+          } finally {
+            setLocalLoading(false);
+          }
         };
         reader.readAsDataURL(file);
       } else {
@@ -109,9 +144,9 @@ export default function LeadFileProcessor({ onLeadsLoaded, isLoading: externalLo
         setFileName(null);
         setLocalLoading(false);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("File processing error:", error);
-      alert('Error processing file. Please try again.');
+      setErrorMsg(`Processing failed: ${error?.message || 'Check your Groq API key is set in Netlify environment variables.'}`);
       setFileName(null);
       setLocalLoading(false);
     }
@@ -137,6 +172,14 @@ export default function LeadFileProcessor({ onLeadsLoaded, isLoading: externalLo
           </div>
         </div>
       </div>
+
+      {errorMsg && (
+        <div className="mb-6 flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400">
+          <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+          <span className="flex-1">{errorMsg}</span>
+          <button onClick={() => setErrorMsg(null)} className="text-red-400 hover:text-red-300"><X size={14} /></button>
+        </div>
+      )}
 
       <div 
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}

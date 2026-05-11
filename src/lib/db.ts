@@ -138,5 +138,5 @@ export const generateHashId = async (input: string): Promise<string> => {
     hash = ((hash << 5) - hash) + char;
     hash = hash & hash;
   }
-  return Math.abs(hash).toString(16) + input.length.toString() + Date.now().toString(16);
+  return Math.abs(hash).toString(16) + '_' + input.length.toString(16);
 };
