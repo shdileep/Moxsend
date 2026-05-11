@@ -38,7 +38,7 @@ export async function generateEmails(params: EmailGenerationParams): Promise<Gen
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "llama-3.1-8b-instant",
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" }
       })
@@ -90,7 +90,7 @@ export async function improveEmail(originalEmail: string, request: string): Prom
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "llama-3.1-8b-instant",
         messages: [{ role: "user", content: prompt }]
       })
     });
@@ -205,7 +205,7 @@ export async function extractLeadsFromText(text: string): Promise<Lead[]> {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "llama-3.1-8b-instant",
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" }
       })
