@@ -38,7 +38,7 @@ export default function Navbar() {
 
 function NavLink({ icon, label, active = false }: { icon: React.ReactNode, label: string, active?: boolean }) {
   return (
-    <a href="#" className={`flex items-center gap-2 text-sm font-medium transition-colors ${active ? 'text-brand-primary' : 'text-slate-400 hover:text-white'}`}>
+    <a href="#" className={`flex items-center gap-2 text-sm font-medium transition-colors ${active ? 'text-brand-primary' : 'text-slate-300 hover:text-white'}`}>
       {icon}
       {label}
       {active && (
