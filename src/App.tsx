@@ -4,13 +4,14 @@ import Hero from './components/sections/Hero';
 import InputSection from './components/workspace/InputSection';
 import EmailCard from './components/workspace/EmailCard';
 import LeadSourceProcessor from './components/workspace/LeadSourceProcessor';
-import ComparisonView from './components/improvement/ComparisonView';
 import { generateEmails, improveEmail } from './services/gemini';
 import { EmailGenerationParams, GeneratedEmail, Lead } from './types';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, Sparkles, Check, Copy, Zap, Info, Download, Eye, X, Trash2, Star, Maximize2, Database } from 'lucide-react';
 import { cn } from './lib/utils';
 import { getAllHistory, getHistoryItem, saveHistory, deleteHistoryItem, toggleStarHistoryItem, generateHashId, HistoryRecord } from './lib/db';
+
+const ComparisonView = React.lazy(() => import('./components/improvement/ComparisonView'));
 
 export default function App() {
   const [emails, setEmails] = useState<GeneratedEmail[]>([]);
@@ -177,10 +178,10 @@ export default function App() {
               <InputSection onGenerate={handleGenerate} isLoading={isLoading} />
               
               <div className="mt-8 p-6 glass-card bg-brand-primary/5 border-brand-primary/20">
-                <h4 className="text-sm font-bold text-brand-primary flex items-center gap-2 mb-2">
+                <h3 className="text-sm font-bold text-brand-primary flex items-center gap-2 mb-2">
                   <Sparkles size={14} /> AI Optimization Tip
-                </h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed">
                   The more specific your product description, the better the personalization. Try mentioning a specific pain point your product solves for the target audience.
                 </p>
               </div>
@@ -255,13 +256,13 @@ export default function App() {
                       key="empty"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="glass-card p-12 flex flex-col items-center justify-center text-center text-slate-500 border-dashed"
+                      className="glass-card p-12 flex flex-col items-center justify-center text-center text-slate-400 border-dashed"
                     >
                       <div className="w-16 h-16 rounded-full bg-slate-900/50 border border-slate-800 flex items-center justify-center mb-6">
                         <Zap size={32} className="opacity-20" />
                       </div>
-                      <h4 className="text-lg font-bold text-slate-400 mb-2">Workspace Ready</h4>
-                      <p className="text-sm max-w-xs">Configure your outreach parameters and generate your first AI variants.</p>
+                      <h4 className="text-lg font-bold text-slate-300 mb-2">Workspace Ready</h4>
+                      <p className="text-sm max-w-xs text-slate-400">Configure your outreach parameters and generate your first AI variants.</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -377,7 +378,7 @@ export default function App() {
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-brand-primary/10">
                     <Database size={14} className="text-brand-primary" />
                   </div>
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500">History Log</h3>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">History Log</h3>
                 </div>
                 
                 <div className="p-8 text-center glass-card rounded-xl border border-slate-800 shadow-2xl bg-slate-900/40 text-slate-400">
@@ -515,12 +516,13 @@ export default function App() {
             </div>
             <span className="text-lg font-bold">Moxsend</span>
           </div>
-          <p className="text-sm text-slate-500">© 2026 Moxsend AI. All rights reserved.</p>
+          <p className="text-sm text-slate-400">© 2026 Moxsend AI. All rights reserved.</p>
         </footer>
       </main>
 
       {/* Improvement Modal */}
       <AnimatePresence>
+      <React.Suspense fallback={null}>
         {improvementTarget && (
           <ComparisonView 
             email={improvementTarget} 
@@ -528,6 +530,7 @@ export default function App() {
             onUpdate={handleImproveUpdate}
           />
         )}
+      </React.Suspense>
       </AnimatePresence>
 
       {/* Copy Toast */}

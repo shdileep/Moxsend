@@ -25,5 +25,17 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom'],
+            'vendor-motion': ['motion'],
+            'vendor-icons': ['lucide-react'],
+          }
+        }
+      },
+      chunkSizeWarningLimit: 1000
+    }
   };
 });

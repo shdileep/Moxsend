@@ -103,12 +103,12 @@ export default function InputSection({ onGenerate, isLoading }: Props) {
         </div>
         <div>
           <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Campaign Logic</h2>
-          <p className="text-xs text-slate-500">Configure your AI outreach parameters</p>
+          <p className="text-xs text-slate-400">Configure your AI outreach parameters</p>
         </div>
       </div>
 
       <div className="mb-8 relative">
-        <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Quick Templates</label>
+        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Quick Templates</label>
         
         <div className="relative mb-4">
           <input 
@@ -142,10 +142,10 @@ export default function InputSection({ onGenerate, isLoading }: Props) {
                     className="p-3 text-left hover:bg-brand-primary/10 rounded-lg transition-all group border border-transparent hover:border-brand-primary/20"
                   >
                     <div className="text-xs font-bold text-slate-200 group-hover:text-brand-primary transition-colors">{t.label}</div>
-                    <div className="text-[10px] text-slate-500 line-clamp-1">{t.desc}</div>
+                    <div className="text-[10px] text-slate-400 line-clamp-1">{t.desc}</div>
                   </button>
                 )) : (
-                  <div className="p-4 text-center text-xs text-slate-500">No matching templates found</div>
+                  <div className="p-4 text-center text-xs text-slate-400">No matching templates found</div>
                 )}
               </div>
             </motion.div>
@@ -155,13 +155,13 @@ export default function InputSection({ onGenerate, isLoading }: Props) {
         <div className="grid grid-cols-2 gap-3">
           {QUICK_TEMPLATES.slice(0, 10).map((t, i) => (
             <button 
-              key={i}
-              type="button"
+              key={i} 
+              type="button" 
               onClick={() => applyTemplate(t)}
               className="p-3 text-left bg-slate-900/50 border border-slate-800 rounded-xl hover:border-brand-primary/50 transition-all group"
             >
               <div className="text-xs font-bold text-slate-300 group-hover:text-brand-primary transition-colors">{t.label}</div>
-              <div className="text-[10px] text-slate-500 line-clamp-1">{t.desc}</div>
+              <div className="text-[10px] text-slate-400 line-clamp-1">{t.desc}</div>
             </button>
           ))}
         </div>
@@ -169,7 +169,7 @@ export default function InputSection({ onGenerate, isLoading }: Props) {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-slate-400 mb-2 flex items-center gap-2">
+          <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
             <MessageSquare size={14} /> Product Description
           </label>
           <textarea 
@@ -182,7 +182,7 @@ export default function InputSection({ onGenerate, isLoading }: Props) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-400 mb-2 flex items-center gap-2">
+          <label className="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
             <Target size={14} /> Target Audience
           </label>
           <input 
@@ -197,7 +197,7 @@ export default function InputSection({ onGenerate, isLoading }: Props) {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-2">Tone</label>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Tone</label>
             <select 
               className="glass-input w-full appearance-none bg-slate-900"
               value={params.tone}
@@ -207,7 +207,7 @@ export default function InputSection({ onGenerate, isLoading }: Props) {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-400 mb-2">Goal</label>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Goal</label>
             <select 
               className="glass-input w-full appearance-none bg-slate-900"
               value={params.goal}

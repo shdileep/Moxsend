@@ -1,8 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { motion } from 'motion/react';
 import { Upload, FileSpreadsheet, X, CheckCircle2, FileText, Loader2, Download, FileImage, AlertCircle } from 'lucide-react';
-import Papa from 'papaparse';
-import * as XLSX from 'xlsx';
 import { Lead } from '../../types';
 import { cn } from '../../lib/utils';
 import { extractLeadsFromFile, extractLeadsFromText } from '../../services/gemini';
@@ -39,6 +37,7 @@ export default function LeadFileProcessor({ onLeadsLoaded, isLoading: externalLo
       }
 
       if (ext === 'csv') {
+        const Papa = (await import('papaparse')).default;
         Papa.parse(file, {
           header: true,
           skipEmptyLines: true,
@@ -66,6 +65,7 @@ export default function LeadFileProcessor({ onLeadsLoaded, isLoading: externalLo
           }
         });
       } else if (ext === 'xlsx' || ext === 'xls') {
+        const XLSX = await import('xlsx');
         const data = await file.arrayBuffer();
         const workbook = XLSX.read(data);
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -82,10 +82,28 @@ export default function LeadFileProcessor({ onLeadsLoaded, isLoading: externalLo
         onLeadsLoaded(leads, true, file.name, fileHash);
         setLocalLoading(false);
       } else if (ext === 'pdf') {
+        const loadPdfJS = () => {
+          return new Promise<void>((resolve, reject) => {
+            if ((window as any).pdfjsLib) {
+              resolve();
+              return;
+            }
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+            script.onload = () => {
+              (window as any).pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+              resolve();
+            };
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+        };
+
         const fileReader = new FileReader();
         fileReader.onload = async function() {
-          const typedarray = new Uint8Array(this.result as ArrayBuffer);
           try {
+            await loadPdfJS();
+            const typedarray = new Uint8Array(this.result as ArrayBuffer);
             // @ts-ignore
             const pdf = await window.pdfjsLib.getDocument(typedarray).promise;
             let fullText = '';
@@ -168,7 +186,7 @@ export default function LeadFileProcessor({ onLeadsLoaded, isLoading: externalLo
           </div>
           <div>
             <h2 className="text-xl font-bold text-white">Advanced Lead Processor</h2>
-            <p className="text-xs text-slate-500">Supports CSV, XLSX, PDF, and Image extraction via AI</p>
+            <p className="text-xs text-slate-400">Supports CSV, XLSX, PDF, and Image extraction via AI</p>
           </div>
         </div>
       </div>
@@ -243,20 +261,20 @@ export default function LeadFileProcessor({ onLeadsLoaded, isLoading: externalLo
         )}
 
         <div className="mt-12 w-full max-w-lg pt-8 border-t border-slate-800 grid grid-cols-2 gap-4">
-          <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+          <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
             <FileSpreadsheet size={14} className="text-green-500" />
             <span>Structured (CSV/XLSX)</span>
           </div>
-          <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+          <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
             <FileText size={14} className="text-red-500" />
             <span>Unstructured (PDF)</span>
           </div>
-          <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+          <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
             <FileImage size={14} className="text-brand-accent" />
             <span>Screenshots (PNG/JPG)</span>
           </div>
           <div className="flex items-center justify-end">
-             <button className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-white transition-colors font-bold uppercase tracking-widest">
+             <button className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-white transition-colors font-bold uppercase tracking-widest">
               <Download size={12} /> Template
              </button>
           </div>
