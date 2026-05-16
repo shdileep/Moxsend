@@ -5,8 +5,8 @@ import { EmailGenerationParams, GeneratedEmail, Lead } from "../types";
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-const GROQ_KEY = () => import.meta.env.VITE_GROQ_API_KEY as string;
-const OR_KEY = () => import.meta.env.VITE_OPENROUTER_API_KEY as string;
+const GROQ_KEY = () => (import.meta.env.VITE_GROQ_API_KEY || "").trim();
+const OR_KEY = () => (import.meta.env.VITE_OPENROUTER_API_KEY || "").trim();
 
 // Text models: Groq primary → OpenRouter fallback
 const TEXT_MODEL_GROQ = "llama-3.3-70b-versatile";
@@ -31,31 +31,39 @@ async function chatWithFallback(
   payload: ChatPayload,
   isVision = false
 ): Promise<string> {
-  // ── Try Groq first ──
-  try {
-    const res = await fetch(GROQ_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${GROQ_KEY()}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ model: groqModel, ...payload }),
-    });
+  // Validate API keys before making requests
+  if (!GROQ_KEY()) {
+    console.warn("Groq API key is missing. Skipping Groq request.");
+  } else {
+    // ── Try Groq first ──
+    try {
+      const res = await fetch(GROQ_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${GROQ_KEY()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ model: groqModel, ...payload }),
+      });
 
-    if (res.status === 429) {
-      console.warn("Groq rate limit hit — switching to OpenRouter fallback.");
-    } else if (res.ok) {
-      const data = await res.json();
-      return data.choices[0].message.content;
-    } else {
-      const errText = await res.text();
-      console.warn(`Groq error ${res.status}: ${errText} — trying OpenRouter.`);
+      if (res.status === 429) {
+        console.warn("Groq rate limit hit — switching to OpenRouter fallback.");
+      } else if (res.ok) {
+        const data = await res.json();
+        return data.choices[0].message.content;
+      } else {
+        const errText = await res.text();
+        console.warn(`Groq error ${res.status}: ${errText} — trying OpenRouter.`);
+      }
+    } catch (e) {
+      console.warn("Groq request failed:", e, "— trying OpenRouter.");
     }
-  } catch (e) {
-    console.warn("Groq request failed:", e, "— trying OpenRouter.");
   }
 
   // ── Fallback: OpenRouter ──
+  if (!OR_KEY()) {
+    throw new Error("OpenRouter API key is missing. Cannot proceed with fallback request.");
+  }
   const orRes = await fetch(OPENROUTER_URL, {
     method: "POST",
     headers: {
