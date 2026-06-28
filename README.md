@@ -63,6 +63,4 @@ Moxsend is a B2B email automation platform that enables sales, marketing, and re
 | **UI Components** | Lucide React (icons) |
 | **Testing** | Cypress, Playwright, Applitools |
 
----
 
-## Project Structure
